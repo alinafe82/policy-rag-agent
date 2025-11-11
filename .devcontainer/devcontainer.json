@@ -1,0 +1,8 @@
+{
+  "name": "AI Agent Dev (uv)",
+  "image": "ghcr.io/astral-sh/uv:python3.11-bookworm",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "postCreateCommand": "uv pip install -e .[dev] && pre-commit install"
+}
