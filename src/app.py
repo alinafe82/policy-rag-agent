@@ -1,4 +1,4 @@
-"""FastAPI application for Policy RAG Agent with production-ready features."""
+"""FastAPI application for policy question answering with citation checks."""
 
 import time
 from contextlib import asynccontextmanager
@@ -54,7 +54,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title=settings.app_name,
     version=settings.app_version,
-    description="Safe, auditable RAG system for enterprise policy documents with citation validation",
+    description="Policy question-answering API with citation validation",
     lifespan=lifespan,
 )
 
