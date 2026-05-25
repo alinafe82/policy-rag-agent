@@ -1,7 +1,7 @@
 [project]
 name = "policy-rag-agent"
 version = "0.2.0"
-description = "Production-ready RAG agent with citation validation and safety guards"
+description = "Policy question-answering API with citation validation and safety guards"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
@@ -28,7 +28,9 @@ dev = [
 
 [tool.ruff]
 line-length = 100
-select = ["E","F","B","I","UP"]
+
+[tool.ruff.lint]
+select = ["E", "F", "B", "I", "UP"]
 ignore = ["E501"]
 
 [tool.mypy]
@@ -49,7 +51,7 @@ addopts = [
     "--cov-report=html",
     "--cov-report=xml",
 ]
-pythonpath = ["src"]
+pythonpath = ["."]
 testpaths = ["tests"]
 asyncio_mode = "auto"
 

@@ -1,4 +1,4 @@
-# Multi-stage Dockerfile for optimized production builds
+# Multi-stage Dockerfile for container builds
 # syntax=docker/dockerfile:1
 
 ARG PYTHON_VERSION=3.11
@@ -30,11 +30,11 @@ ARG VERSION
 
 LABEL org.opencontainers.image.created="${BUILD_DATE}" \
       org.opencontainers.image.title="Policy RAG Agent" \
-      org.opencontainers.image.description="Production-ready RAG agent with citation validation" \
+      org.opencontainers.image.description="Policy question-answering API with citation validation" \
       org.opencontainers.image.version="${VERSION}" \
       org.opencontainers.image.revision="${VCS_REF}" \
-      org.opencontainers.image.vendor="Policy RAG Team" \
-      org.opencontainers.image.source="https://github.com/yourorg/policy-rag-agent"
+      org.opencontainers.image.vendor="Alinafe Matenda" \
+      org.opencontainers.image.source="https://github.com/alinafe82/policy-rag-agent"
 
 # Create non-root user for security
 RUN groupadd -r appuser && \

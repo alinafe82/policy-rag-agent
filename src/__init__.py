@@ -1,3 +1,3 @@
-"""Policy RAG Agent - Production-ready RAG system with citation validation."""
+"""Policy RAG Agent - policy question answering with citation validation."""
 
 __version__ = "0.2.0"
