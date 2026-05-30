@@ -17,3 +17,6 @@ junit.xml
 .idea/
 .DS_Store
 *.egg-info/
+
+# Local architecture-agent context. Do not publish.
+.specs/
