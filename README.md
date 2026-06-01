@@ -8,12 +8,13 @@ A FastAPI service that answers policy questions against a small local document s
 
 A RAG system that answers confidently without citing a source is a liability dressed up as a productivity tool. People will quote its output to make decisions; if there is no traceable source, the quoted thing is now part of the institutional record with no provenance.
 
-So this repo's guardrail does four things in order, and any one of them sends the request down the refusal path:
+So this repo's guardrail does three things, and any one of them sends the request down the refusal path:
 
-1. Confirm the model's response cites a document the retriever actually returned.
-2. Confirm the cited document is not a hallucinated identifier.
-3. Confirm the response confidence clears the threshold.
-4. Confirm the response does not match unsafe-answer patterns (long uncited paragraphs, "as an AI" preambles, etc.).
+1. Confirm the model's response cites at least one document the retriever actually returned (`src.guard.GuardRules.validate_citations`).
+2. Confirm the response confidence clears the threshold (`calculate_confidence`).
+3. Confirm the response does not match unsafe-answer patterns (long uncited paragraphs, "i think", "in my opinion", etc.).
+
+A known gap, called out so a reviewer can see it: the citation check confirms that at least one cited doc is real but does not reject *extra* citation IDs that look like documents the retriever did not return (for example `[DOC-999]` appearing alongside a valid `[DOC-001]`). Closing that gap is straightforward (compare every `[...]` token against the retrieved doc set) and is named in "Adapter work left" below.
 
 Refusal returns a structured response that says *what* failed, not just "I don't know". That is the part a reviewer can audit.
 
@@ -67,12 +68,12 @@ Design notes: [docs/architecture.md](docs/architecture.md).
 
 - Replace the in-memory `src.store` with a real retriever (Elasticsearch, pgvector, etc.).
 - Add source-level authorization before retrieval. The current code retrieves first and answers second, which is the wrong order if some users should not see some documents.
+- Tighten `validate_citations` to also reject any `[DOC-XYZ]` token in the response whose ID is not in the retrieved doc set (the current implementation only confirms at least one returned doc is cited).
 - Add a real LLM provider, not the mock backend. Token, timeout, and cost limits go in `src.llm`.
 - Add a refusal-reason metric so a dashboard can show the rate of each refusal cause over time.
 
 ## Operational notes
 
-- [docs/runbook.md](docs/runbook.md) if present
-- [docs/security-notes.md](docs/security-notes.md)
-- [docs/production-readiness.md](docs/production-readiness.md)
-- [docs/interview-notes.md](docs/interview-notes.md)
+- [docs/architecture.md](docs/architecture.md) — design notes.
+- [docs/interview-notes.md](docs/interview-notes.md) — portfolio context.
+- [docs/adr/](docs/adr/) — design records.
