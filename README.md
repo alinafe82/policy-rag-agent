@@ -1,15 +1,21 @@
 # Policy RAG Agent
 
-Policy question-answering API with citation validation.
+A FastAPI service that answers policy questions against a small local document store **and refuses to answer when it cannot cite the source**. The refusal path is the actual engineering point of this repo; the answer path is the easy part.
 
-The service answers questions against a small local document store and refuses answers that do
-not include valid citations. It is a public-safe demo of the guardrail and API shape, not a
-production document platform.
+> **Access control is not implemented.** The local document store has no tenant isolation, no per-document ACL, no row-level filtering. Anyone who can reach the API can see every document. Treat this repo as a guardrail demo, not a multi-tenant policy platform. Any production use needs source-level authorization wired in before retrieval.
 
-## Why It Exists
+## Why the refusal path matters more than the answer path
 
-Internal policy answers are only useful when people can see the source. This repo keeps the
-retrieval, answer generation, citation validation, and refusal logic small enough to test.
+A RAG system that answers confidently without citing a source is a liability dressed up as a productivity tool. People will quote its output to make decisions; if there is no traceable source, the quoted thing is now part of the institutional record with no provenance.
+
+So this repo's guardrail does four things in order, and any one of them sends the request down the refusal path:
+
+1. Confirm the model's response cites a document the retriever actually returned.
+2. Confirm the cited document is not a hallucinated identifier.
+3. Confirm the response confidence clears the threshold.
+4. Confirm the response does not match unsafe-answer patterns (long uncited paragraphs, "as an AI" preambles, etc.).
+
+Refusal returns a structured response that says *what* failed, not just "I don't know". That is the part a reviewer can audit.
 
 ## Quickstart
 
@@ -34,28 +40,39 @@ curl -X POST http://127.0.0.1:8000/ask \
   -d '{"query":"What are the MFA requirements?"}'
 ```
 
-## Architecture Overview
+## Service layout
 
-- `src.app` exposes the FastAPI endpoints.
-- `src.store` provides the local document store and search behavior.
-- `src.llm` isolates provider-backed or mock answer generation.
-- `src.guard` validates citations, confidence, and unsafe answer patterns.
-- `src.cache` keeps repeat requests cheap in local runs.
+- `src.app` — FastAPI endpoints, request validation, error envelope.
+- `src.store` — in-memory document store and lookup (this is the part that would be replaced by a real retriever).
+- `src.llm` — provider boundary; mock backend is default so the repo runs without keys.
+- `src.guard` — the refusal logic: citation validation, confidence threshold, unsafe-pattern check.
+- `src.cache` — repeat-question cache for local runs.
 
-See [docs/architecture.md](docs/architecture.md) for design details.
+Design notes: [docs/architecture.md](docs/architecture.md).
 
-## Limitations
+## What the tests prove
 
-- The document store is in memory.
-- The default provider is mock/local behavior.
-- This repo does not include tenant isolation, document ingestion, or access control.
+`tests/test_guard.py` covers the refusal contract:
 
-## Future Improvements
+- responses without citations are refused.
+- responses citing documents the retriever did not return are refused.
+- responses below the confidence threshold are refused.
+- empty responses are refused.
+- responses matching hallucination patterns are refused.
+- approved responses carry decision metadata explaining why they were approved.
 
-- Add a real document ingestion pipeline.
-- Add source-level authorization before retrieval.
-- Track refusal reasons and answer quality metrics.
+`tests/test_app.py` covers the API envelope and `tests/test_cache.py` covers cache behaviour.
 
-## Interview Notes
+## Adapter work left before this would serve real policies
 
-See [docs/interview-notes.md](docs/interview-notes.md).
+- Replace the in-memory `src.store` with a real retriever (Elasticsearch, pgvector, etc.).
+- Add source-level authorization before retrieval. The current code retrieves first and answers second, which is the wrong order if some users should not see some documents.
+- Add a real LLM provider, not the mock backend. Token, timeout, and cost limits go in `src.llm`.
+- Add a refusal-reason metric so a dashboard can show the rate of each refusal cause over time.
+
+## Operational notes
+
+- [docs/runbook.md](docs/runbook.md) if present
+- [docs/security-notes.md](docs/security-notes.md)
+- [docs/production-readiness.md](docs/production-readiness.md)
+- [docs/interview-notes.md](docs/interview-notes.md)
