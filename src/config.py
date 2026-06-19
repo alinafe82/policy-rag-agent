@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     api_timeout_seconds: int = 30
 
     # LLM
-    llm_provider: Literal["mock", "openai", "anthropic", "azure"] = "mock"
+    llm_provider: Literal["mock"] = "mock"
     llm_model: str = "gpt-4"
     llm_api_key: str = ""
     llm_max_tokens: int = 1000

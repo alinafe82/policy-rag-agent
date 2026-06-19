@@ -14,7 +14,7 @@ traceability matters.
 
 - FastAPI app: request validation, health, metrics, and answer endpoint.
 - Store: local document chunks and search behavior.
-- LLM provider interface: mock or provider-backed answer generation.
+- LLM provider interface: local answer generation behind a narrow adapter.
 - Guard: citation validation, confidence scoring, and refusal logic.
 - Cache: short-term response reuse for repeated questions.
 
@@ -52,4 +52,4 @@ and track refusal rates.
 ## Testing Strategy
 
 Tests cover citation validation, store behavior, cache behavior, app endpoints, and provider
-selection. Adapter tests would be needed for real retrieval or provider integrations.
+selection. Adapter tests would be needed for retrieval or provider integrations.

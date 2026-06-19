@@ -2,7 +2,7 @@
 
 import pytest
 
-from src.llm import AnthropicLLM, MockLLM, OpenAILLM, get_llm
+from src.llm import MockLLM, get_llm
 from src.store import Chunk
 
 
@@ -74,34 +74,6 @@ class TestMockLLM:
         assert "no relevant" in response.lower()
 
 
-class TestOpenAILLM:
-    """Test OpenAILLM implementation."""
-
-    @pytest.fixture
-    def llm(self):
-        """Create OpenAILLM instance."""
-        return OpenAILLM()
-
-    async def test_openai_not_implemented(self, llm):
-        """Test that OpenAI LLM raises NotImplementedError."""
-        with pytest.raises(NotImplementedError):
-            await llm.complete("test", [])
-
-
-class TestAnthropicLLM:
-    """Test AnthropicLLM implementation."""
-
-    @pytest.fixture
-    def llm(self):
-        """Create AnthropicLLM instance."""
-        return AnthropicLLM()
-
-    async def test_anthropic_not_implemented(self, llm):
-        """Test that Anthropic LLM raises NotImplementedError."""
-        with pytest.raises(NotImplementedError):
-            await llm.complete("test", [])
-
-
 class TestGetLLM:
     """Test get_llm factory function."""
 
@@ -124,7 +96,7 @@ class TestGetLLM:
         assert isinstance(llm, MockLLM)
 
     def test_get_llm_unknown_provider(self, monkeypatch):
-        """Test get_llm with unknown provider falls back to mock."""
+        """Test get_llm fails fast with unknown provider."""
         from src.config import Settings
 
         def mock_get_settings():
@@ -133,5 +105,5 @@ class TestGetLLM:
             return settings
 
         monkeypatch.setattr("src.llm.get_settings", mock_get_settings)
-        llm = get_llm()
-        assert isinstance(llm, MockLLM)
+        with pytest.raises(ValueError, match="Unsupported LLM provider"):
+            get_llm()
