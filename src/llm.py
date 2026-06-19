@@ -72,11 +72,10 @@ def get_llm() -> BaseLLM:
         "mock": MockLLM,
     }
 
-    provider_class = llm_providers.get(settings.llm_provider, MockLLM)
     if settings.llm_provider not in llm_providers:
-        logger.warning(
-            f"Unknown LLM provider: {settings.llm_provider}, falling back to mock"
-        )
+        raise ValueError(f"Unsupported LLM provider: {settings.llm_provider}")
+
+    provider_class = llm_providers[settings.llm_provider]
 
     logger.info(f"Initialized LLM provider: {provider_class.__name__}")
     return provider_class()

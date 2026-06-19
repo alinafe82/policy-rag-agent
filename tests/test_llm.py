@@ -96,7 +96,7 @@ class TestGetLLM:
         assert isinstance(llm, MockLLM)
 
     def test_get_llm_unknown_provider(self, monkeypatch):
-        """Test get_llm with unknown provider falls back to mock."""
+        """Test get_llm fails fast with unknown provider."""
         from src.config import Settings
 
         def mock_get_settings():
@@ -105,5 +105,5 @@ class TestGetLLM:
             return settings
 
         monkeypatch.setattr("src.llm.get_settings", mock_get_settings)
-        llm = get_llm()
-        assert isinstance(llm, MockLLM)
+        with pytest.raises(ValueError, match="Unsupported LLM provider"):
+            get_llm()
