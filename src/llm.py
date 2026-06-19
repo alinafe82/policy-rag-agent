@@ -1,4 +1,4 @@
-"""LLM interface with support for multiple providers."""
+"""LLM interface for the local policy-answer generator."""
 
 from abc import ABC, abstractmethod
 
@@ -64,46 +64,19 @@ class MockLLM(BaseLLM):
         return "No relevant policy found in the knowledge base."
 
 
-class OpenAILLM(BaseLLM):
-    """OpenAI LLM implementation (placeholder for future integration)."""
-
-    async def complete(self, prompt: str, context: list[Chunk]) -> str:
-        """Generate completion using OpenAI API."""
-        # TODO: Implement OpenAI integration
-        # from openai import AsyncOpenAI
-        # client = AsyncOpenAI(api_key=settings.llm_api_key)
-        # response = await client.chat.completions.create(...)
-        raise NotImplementedError("OpenAI integration not yet implemented")
-
-
-class AnthropicLLM(BaseLLM):
-    """Anthropic Claude implementation (placeholder for future integration)."""
-
-    async def complete(self, prompt: str, context: list[Chunk]) -> str:
-        """Generate completion using Anthropic API."""
-        # TODO: Implement Anthropic integration
-        # from anthropic import AsyncAnthropic
-        # client = AsyncAnthropic(api_key=settings.llm_api_key)
-        # response = await client.messages.create(...)
-        raise NotImplementedError("Anthropic integration not yet implemented")
-
-
-def get_llm() -> MockLLM | OpenAILLM | AnthropicLLM:
+def get_llm() -> BaseLLM:
     """Get LLM instance based on configuration."""
     settings = get_settings()
 
     llm_providers: dict[str, type[BaseLLM]] = {
         "mock": MockLLM,
-        "openai": OpenAILLM,
-        "anthropic": AnthropicLLM,
     }
 
     provider_class = llm_providers.get(settings.llm_provider, MockLLM)
-    if provider_class is None or settings.llm_provider not in llm_providers:
+    if settings.llm_provider not in llm_providers:
         logger.warning(
             f"Unknown LLM provider: {settings.llm_provider}, falling back to mock"
         )
-        provider_class = MockLLM
 
-    logger.info(f"Initialized LLM provider: {settings.llm_provider}")
+    logger.info(f"Initialized LLM provider: {provider_class.__name__}")
     return provider_class()

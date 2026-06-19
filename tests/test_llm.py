@@ -2,7 +2,7 @@
 
 import pytest
 
-from src.llm import AnthropicLLM, MockLLM, OpenAILLM, get_llm
+from src.llm import MockLLM, get_llm
 from src.store import Chunk
 
 
@@ -72,34 +72,6 @@ class TestMockLLM:
         """Test MockLLM with no context."""
         response = await llm.complete("What is the policy?", [])
         assert "no relevant" in response.lower()
-
-
-class TestOpenAILLM:
-    """Test OpenAILLM implementation."""
-
-    @pytest.fixture
-    def llm(self):
-        """Create OpenAILLM instance."""
-        return OpenAILLM()
-
-    async def test_openai_not_implemented(self, llm):
-        """Test that OpenAI LLM raises NotImplementedError."""
-        with pytest.raises(NotImplementedError):
-            await llm.complete("test", [])
-
-
-class TestAnthropicLLM:
-    """Test AnthropicLLM implementation."""
-
-    @pytest.fixture
-    def llm(self):
-        """Create AnthropicLLM instance."""
-        return AnthropicLLM()
-
-    async def test_anthropic_not_implemented(self, llm):
-        """Test that Anthropic LLM raises NotImplementedError."""
-        with pytest.raises(NotImplementedError):
-            await llm.complete("test", [])
 
 
 class TestGetLLM:
