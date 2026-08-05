@@ -308,7 +308,14 @@ async def ask(q: Question) -> Answer:
             },
         )
 
-        return Answer(**result, cached=False, process_time_ms=process_time_ms)
+        return Answer(
+            answer=decision.answer,
+            sources=[d.id for d in docs],
+            confidence=decision.confidence,
+            citations_found=decision.citations_found,
+            cached=False,
+            process_time_ms=process_time_ms,
+        )
 
     except HTTPException:
         raise
