@@ -46,9 +46,7 @@ SAMPLE_POLICIES = [
         "PII should be masked in logs and backups. Use tokenization for sensitive data.",
     ),
     Chunk("PRIV-011", "GDPR data subject requests must be fulfilled within 30 days."),
-    Chunk(
-        "PRIV-012", "Data retention: customer data kept for 7 years, logs for 1 year."
-    ),
+    Chunk("PRIV-012", "Data retention: customer data kept for 7 years, logs for 1 year."),
     Chunk(
         "COMP-001",
         "SOC 2 Type II compliance required for all customer-facing services.",

@@ -58,9 +58,7 @@ class SimpleCache:
     def _evict_expired(self) -> None:
         """Remove expired entries."""
         now = time.time()
-        expired_keys = [
-            key for key, entry in self._cache.items() if now > entry.expires_at
-        ]
+        expired_keys = [key for key, entry in self._cache.items() if now > entry.expires_at]
         for key in expired_keys:
             del self._cache[key]
 
