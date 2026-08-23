@@ -2,23 +2,18 @@
 # syntax=docker/dockerfile:1
 
 ARG PYTHON_VERSION=3.11
-ARG UV_VERSION=0.4.18
+ARG UV_VERSION=0.12.4
 
 # Stage 1: Builder
 FROM ghcr.io/astral-sh/uv:${UV_VERSION}-python${PYTHON_VERSION}-bookworm AS builder
 
 WORKDIR /build
 
-# Copy dependency files
-COPY pyproject.toml README.md ./
-
-# Install dependencies in a virtual environment
-RUN uv venv /opt/venv && \
-    . /opt/venv/bin/activate && \
-    uv pip install --no-cache .
-
-# Copy source code
+# Install the exact tested production dependency graph from uv.lock.
+COPY pyproject.toml uv.lock README.md ./
 COPY src ./src
+ENV UV_PROJECT_ENVIRONMENT=/opt/venv
+RUN uv sync --frozen --no-dev --no-editable
 
 # Stage 2: Runtime
 FROM python:${PYTHON_VERSION}-slim-bookworm AS runtime

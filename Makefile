@@ -7,7 +7,7 @@ lint:
 	ruff check . && mypy src
 
 format:
-	ruff check . --fix && ruff format . && isort . && black .
+	ruff check . --fix && ruff format .
 
 test:
 	pytest -q --maxfail=1
