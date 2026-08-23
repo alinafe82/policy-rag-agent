@@ -39,6 +39,33 @@ class TestGuardRules:
         assert "Missing citations" in reason
         assert count == 0
 
+    def test_validate_citations_rejects_unknown_document_ids(self, guard, sample_docs):
+        draft = "MFA is required [DOC-001], with an invented exception [DOC-999]."
+
+        is_valid, reason, count = guard.validate_citations(draft, sample_docs)
+
+        assert is_valid is False
+        assert "Unknown citations: DOC-999" in reason
+        assert count == 1
+
+    def test_validate_citations_counts_each_source_once(self, guard, sample_docs):
+        draft = "MFA is required [DOC-001]. Again, see [DOC-001]."
+
+        is_valid, reason, count = guard.validate_citations(draft, sample_docs)
+
+        assert is_valid is True
+        assert reason == ""
+        assert count == 1
+
+    def test_validate_citations_ignores_markdown_link_labels(self, guard, sample_docs):
+        draft = "See [the policy](https://example.com) and source [DOC-001]."
+
+        is_valid, reason, count = guard.validate_citations(draft, sample_docs)
+
+        assert is_valid is True
+        assert reason == ""
+        assert count == 1
+
     def test_validate_citations_empty_response(self, guard, sample_docs):
         """Test validation fails with empty response."""
         is_valid, reason, count = guard.validate_citations("", sample_docs)

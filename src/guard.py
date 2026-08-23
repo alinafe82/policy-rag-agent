@@ -1,5 +1,6 @@
 """Citation validation and safety guard for RAG responses."""
 
+import re
 from dataclasses import dataclass
 
 from .config import get_settings
@@ -28,9 +29,7 @@ class GuardRules:
         """Initialize guard with minimum confidence threshold."""
         self.min_confidence = min_confidence
 
-    def validate_citations(
-        self, draft: str, docs: list[Chunk]
-    ) -> tuple[bool, str, int]:
+    def validate_citations(self, draft: str, docs: list[Chunk]) -> tuple[bool, str, int]:
         """Validate that response includes proper citations.
 
         Returns:
@@ -42,8 +41,13 @@ class GuardRules:
         if not draft or not draft.strip():
             return False, "Empty response from LLM", 0
 
-        # Check for citation format [DOC-ID]
-        cited_count = sum(1 for doc in docs if f"[{doc.id}]" in draft)
+        cited_ids = set(re.findall(r"\[([A-Z][A-Z0-9]*-[0-9]+)\]", draft))
+        source_ids = {doc.id for doc in docs}
+        unknown_ids = sorted(cited_ids - source_ids)
+        cited_count = len(cited_ids & source_ids)
+
+        if unknown_ids:
+            return False, f"Unknown citations: {', '.join(unknown_ids)}", cited_count
 
         if cited_count == 0:
             return (
