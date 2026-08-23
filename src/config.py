@@ -23,7 +23,8 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
 
     # API
-    api_host: str = "0.0.0.0"
+    # Containers must listen beyond loopback so the published port is reachable.
+    api_host: str = "0.0.0.0"  # nosec B104
     api_port: int = 8000
     api_workers: int = 4
     api_timeout_seconds: int = 30

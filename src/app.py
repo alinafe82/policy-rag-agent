@@ -34,9 +34,7 @@ async def lifespan(app: FastAPI):
     logger.info(f"Environment: {settings.environment}")
 
     store = InMemoryStore.from_samples()
-    cache = SimpleCache(
-        ttl_seconds=settings.cache_ttl_seconds, max_size=settings.cache_max_size
-    )
+    cache = SimpleCache(ttl_seconds=settings.cache_ttl_seconds, max_size=settings.cache_max_size)
 
     request_metrics["total_requests"] = 0
     request_metrics["successful_requests"] = 0
@@ -99,11 +97,7 @@ async def global_exception_handler(request: Request, exc: Exception):
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={
             "error": "Internal server error",
-            "detail": (
-                str(exc)
-                if not settings.is_production
-                else "An unexpected error occurred"
-            ),
+            "detail": (str(exc) if not settings.is_production else "An unexpected error occurred"),
         },
     )
 
@@ -248,9 +242,7 @@ async def ask(q: Question) -> Answer:
                 logger.info("Returning cached result")
                 request_metrics["successful_requests"] += 1
                 process_time_ms = (time.time() - start_time) * 1000
-                return Answer(
-                    **cached_result, cached=True, process_time_ms=process_time_ms
-                )
+                return Answer(**cached_result, cached=True, process_time_ms=process_time_ms)
 
         # Search for relevant documents
         docs = await store.search(q.query, top_k=settings.rag_top_k)
@@ -282,9 +274,7 @@ async def ask(q: Question) -> Answer:
         if not decision.allowed:
             logger.warning(f"Response rejected: {decision.reason}")
             request_metrics["failed_requests"] += 1
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail=decision.reason
-            )
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=decision.reason)
 
         # Prepare response
         process_time_ms = (time.time() - start_time) * 1000

@@ -29,9 +29,7 @@ def setup_logger(name: str = __name__) -> logging.Logger:
             '"message":"%(message)s","function":"%(funcName)s","line":%(lineno)d}'
         )
     else:
-        formatter = logging.Formatter(
-            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-        )
+        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
     handler.setFormatter(formatter)
     logger.addHandler(handler)
@@ -44,10 +42,6 @@ def log_request(logger: logging.Logger, method: str, path: str, **kwargs: Any) -
     logger.info(f"Request: {method} {path}", extra=kwargs)
 
 
-def log_error(
-    logger: logging.Logger, error: Exception, context: dict[str, Any]
-) -> None:
+def log_error(logger: logging.Logger, error: Exception, context: dict[str, Any]) -> None:
     """Log error with full context."""
-    logger.error(
-        f"Error: {type(error).__name__}: {str(error)}", extra=context, exc_info=True
-    )
+    logger.error(f"Error: {type(error).__name__}: {str(error)}", extra=context, exc_info=True)

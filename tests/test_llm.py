@@ -17,9 +17,7 @@ class TestMockLLM:
     @pytest.fixture
     def mfa_context(self):
         """MFA-related context."""
-        return [
-            Chunk("IT-101", "MFA is required for administrative access to all systems.")
-        ]
+        return [Chunk("IT-101", "MFA is required for administrative access to all systems.")]
 
     @pytest.fixture
     def secrets_context(self):
@@ -47,9 +45,7 @@ class TestMockLLM:
 
     async def test_mock_llm_training_query(self, llm):
         """Test MockLLM handles training queries."""
-        context = [
-            Chunk("HR-001", "Employees must complete security training annually.")
-        ]
+        context = [Chunk("HR-001", "Employees must complete security training annually.")]
         response = await llm.complete("What is the training policy?", context)
         assert "training" in response.lower()
         assert "[HR-001]" in response

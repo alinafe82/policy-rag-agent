@@ -75,9 +75,7 @@ class TestAskEndpoint:
 
     def test_ask_secrets_query(self, client):
         """Test asking about secrets policy."""
-        response = client.post(
-            "/ask", json={"query": "How should we handle secrets in git?"}
-        )
+        response = client.post("/ask", json={"query": "How should we handle secrets in git?"})
         assert response.status_code == 200
         data = response.json()
         assert "vault" in data["answer"].lower() or "secret" in data["answer"].lower()
@@ -86,9 +84,7 @@ class TestAskEndpoint:
         """Test asking about PII policy."""
         response = client.post(
             "/ask",
-            json={
-                "query": "How should we handle personal data and PII in system logs?"
-            },
+            json={"query": "How should we handle personal data and PII in system logs?"},
         )
         assert response.status_code == 200
         data = response.json()
@@ -136,9 +132,7 @@ class TestAskEndpoint:
 
     def test_ask_response_metadata(self, client):
         """Test response includes all required metadata."""
-        response = client.post(
-            "/ask", json={"query": "What are the password requirements?"}
-        )
+        response = client.post("/ask", json={"query": "What are the password requirements?"})
         assert response.status_code == 200
         data = response.json()
 

@@ -31,13 +31,13 @@ class MockLLM(BaseLLM):
         if "mfa" in prompt_lower or "multi-factor" in prompt_lower:
             relevant = [c for c in context if "mfa" in c.text.lower()]
             if relevant:
-                return f"MFA is required for administrative access to all systems [{relevant[0].id}]."
+                return (
+                    f"MFA is required for administrative access to all systems [{relevant[0].id}]."
+                )
 
         if "secret" in prompt_lower or "credential" in prompt_lower:
             relevant = [
-                c
-                for c in context
-                if "secret" in c.text.lower() or "vault" in c.text.lower()
+                c for c in context if "secret" in c.text.lower() or "vault" in c.text.lower()
             ]
             if relevant:
                 return f"Secrets must not be committed to git. Use a vault like HashiCorp Vault or AWS Secrets Manager [{relevant[0].id}]."

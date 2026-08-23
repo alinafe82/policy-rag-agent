@@ -28,7 +28,7 @@ class SimpleCache:
         key_parts = [str(arg) for arg in args]
         key_parts.extend(f"{k}={v}" for k, v in sorted(kwargs.items()))
         key_str = "|".join(key_parts)
-        return hashlib.md5(key_str.encode()).hexdigest()
+        return hashlib.sha256(key_str.encode()).hexdigest()
 
     def get(self, key: str) -> Any | None:
         """Get value from cache if not expired."""
@@ -58,9 +58,7 @@ class SimpleCache:
     def _evict_expired(self) -> None:
         """Remove expired entries."""
         now = time.time()
-        expired_keys = [
-            key for key, entry in self._cache.items() if now > entry.expires_at
-        ]
+        expired_keys = [key for key, entry in self._cache.items() if now > entry.expires_at]
         for key in expired_keys:
             del self._cache[key]
 
