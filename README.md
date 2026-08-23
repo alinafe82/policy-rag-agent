@@ -14,7 +14,7 @@ So this repo's guardrail does three things, and any one of them sends the reques
 2. Confirm the response confidence clears the threshold (`calculate_confidence`).
 3. Confirm the response does not match unsafe-answer patterns (long uncited paragraphs, "i think", "in my opinion", etc.).
 
-A known gap, called out so a reviewer can see it: the citation check confirms that at least one cited doc is real but does not reject *extra* citation IDs that look like documents the retriever did not return (for example `[DOC-999]` appearing alongside a valid `[DOC-001]`). Closing that gap is straightforward (compare every `[...]` token against the retrieved doc set) and is named in "Adapter work left" below.
+Citation validation fails closed when a response includes a document-shaped ID that was not returned by retrieval (for example `[DOC-999]`). Ordinary Markdown link labels are not treated as document citations.
 
 Refusal returns a structured response that says *what* failed, not just "I don't know". That is the part a reviewer can audit.
 
@@ -68,7 +68,7 @@ Design notes: [docs/architecture.md](docs/architecture.md).
 
 - Replace the in-memory `src.store` with a real retriever (Elasticsearch, pgvector, etc.).
 - Add source-level authorization before retrieval. The current code retrieves first and answers second, which is the wrong order if some users should not see some documents.
-- Tighten `validate_citations` to also reject any `[DOC-XYZ]` token in the response whose ID is not in the retrieved doc set (the current implementation only confirms at least one returned doc is cited).
+- Make the current `PREFIX-123` citation grammar configurable when a production retriever defines a different document-ID format.
 - Add a real LLM provider, not the mock backend. Token, timeout, and cost limits go in `src.llm`.
 - Add a refusal-reason metric so a dashboard can show the rate of each refusal cause over time.
 
